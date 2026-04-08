@@ -1,9 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/webhook.js": {
-      "runtime": "node18.x"
-    }
   },
   "routes": [
     {
