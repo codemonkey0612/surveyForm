@@ -48,7 +48,7 @@ export default async function handler(req, res) {
 
 // ============================================
 // GASにデータを転送する関数
-// fetchの代わりにhttpsモジュールを使用
+// fetchの代わりにhttpsモジュールを使用2
 // ============================================
 
 function forwardToGas(gasUrl, body) {
