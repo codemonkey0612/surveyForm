@@ -2,7 +2,7 @@
   "version": 2,
   "functions": {
     "api/webhook.js": {
-      "runtime": "18.x"
+      "runtime": "node18.x"
     }
   },
   "routes": [
