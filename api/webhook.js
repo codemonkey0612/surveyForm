@@ -46,11 +46,6 @@ export default async function handler(req, res) {
   return res.status(200).json({ status: 'ok' });
 }
 
-// ============================================
-// GASにデータを転送する関数
-// fetchの代わりにhttpsモジュールを使用
-// ============================================
-
 function forwardToGas(gasUrl, body) {
   return new Promise((resolve, reject) => {
 
@@ -101,9 +96,6 @@ function forwardToGas(gasUrl, body) {
   });
 }
 
-// ============================================
-// リダイレクト先に転送する関数
-// ============================================
 function forwardToRedirect(redirectUrl, body) {
   return new Promise((resolve, reject) => {
 
