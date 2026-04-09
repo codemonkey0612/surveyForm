@@ -28,11 +28,11 @@ export default async function handler(req, res) {
 
     // ★ LINEにすぐ200を返す
     res.status(200).json({ status: 'ok' });
-
+    console.log(req.body);
     // ★ バックグラウンドでGASに転送
     const GAS_URL =
       'https://script.google.com/macros/s/AKfycbzrKsW3GXa5pSQPGTuhFGXdZY5TzLXMSqIfYSWxPd5FsncFbtHvUx3xJGEDt3G6gjUqyg/exec';
-
+    
     try {
       await forwardToGas(GAS_URL, req.body);
       console.log('GASに転送完了');
