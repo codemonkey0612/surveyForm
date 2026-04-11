@@ -176,101 +176,101 @@
 // ============================================
 // ★ 設定（変更が必要な箇所）
 // ============================================
-// const GAS_URL = "https://survey-form-beta-rosy.vercel.app/api/webhook";
+const GAS_URL = "https://survey-form-beta-rosy.vercel.app/api/webhook";
 
-// // ★ LIFFのIDを確認して正しいものを設定
-// // LINE DevelopersのLIFFタブで確認
-// const LIFF_ID = "2009328550-oDjbmdjJ"; // ← 先頭の"2"を削除
+// ★ LIFFのIDを確認して正しいものを設定
+// LINE DevelopersのLIFFタブで確認
+const LIFF_ID = "2009328550-oDjbmdjJ"; // ← 先頭の"2"を削除
 
-// // ============================================
-// // LIFF 初期化
-// // ============================================
-// let lineUserId = "";
+// ============================================
+// LIFF 初期化
+// ============================================
+let lineUserId = "";
 
-// liff.init({ liffId: LIFF_ID })
-//   .then(async () => {
+liff.init({ liffId: LIFF_ID })
+  .then(async () => {
 
-//     // ログインしていない場合はLINEログインへ
-//     if (!liff.isLoggedIn()) {
-//       liff.login();
-//       return;
-//     }
+    // ログインしていない場合はLINEログインへ
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return;
+    }
 
-//     // ★ LIFFからuserIdを自動取得
-//     const profile = await liff.getProfile();
-//     lineUserId = profile.userId;
-//     console.log("userId取得成功:", lineUserId);
+    // ★ LIFFからuserIdを自動取得
+    const profile = await liff.getProfile();
+    lineUserId = profile.userId;
+    console.log("userId取得成功:", lineUserId);
 
-//     // ボタンのイベントを設定
-//     document.getElementById("submitBtn")
-//       .addEventListener("click", submitForm);
-//   })
-//   .catch(err => {
-//     console.error("LIFF初期化エラー:", err);
-//     document.getElementById("error-msg").textContent =
-//       "初期化に失敗しました。LINEアプリから開き直してください。";
-//     document.getElementById("error-msg").style.display = "block";
-//   });
+    // ボタンのイベントを設定
+    document.getElementById("submitBtn")
+      .addEventListener("click", submitForm);
+  })
+  .catch(err => {
+    console.error("LIFF初期化エラー:", err);
+    document.getElementById("error-msg").textContent =
+      "初期化に失敗しました。LINEアプリから開き直してください。";
+    document.getElementById("error-msg").style.display = "block";
+  });
 
 
-// // ============================================
-// // フォーム送信処理
-// // ★ URLSearchParams → JSON.stringify に変更
-// // ============================================
-// async function submitForm() {
-//   const parentName   = document.getElementById("parentName").value.trim();
-//   const email        = document.getElementById("email").value.trim();
-//   const childName    = document.getElementById("childName").value.trim();
-//   const grade        = document.getElementById("grade").value;
-//   const studyHistory = document.getElementById("studyHistory").value;
-//   const err          = document.getElementById("error-msg");
+// ============================================
+// フォーム送信処理
+// ★ URLSearchParams → JSON.stringify に変更
+// ============================================
+async function submitForm() {
+  const parentName   = document.getElementById("parentName").value.trim();
+  const email        = document.getElementById("email").value.trim();
+  const childName    = document.getElementById("childName").value.trim();
+  const grade        = document.getElementById("grade").value;
+  const studyHistory = document.getElementById("studyHistory").value;
+  const err          = document.getElementById("error-msg");
 
-//   // バリデーション
-//   if (!parentName || !email || !childName || !grade || !studyHistory) {
-//     err.textContent = "すべての項目を入力してください";
-//     err.style.display = "block";
-//     return;
-//   }
+  // バリデーション
+  if (!parentName || !email || !childName || !grade || !studyHistory) {
+    err.textContent = "すべての項目を入力してください";
+    err.style.display = "block";
+    return;
+  }
 
-//   // メール形式チェック
-//   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//   if (!emailRegex.test(email)) {
-//     err.textContent = "正しいメールアドレスを入力してください";
-//     err.style.display = "block";
-//     return;
-//   }
+  // メール形式チェック
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    err.textContent = "正しいメールアドレスを入力してください";
+    err.style.display = "block";
+    return;
+  }
 
-//   err.style.display = "none";
+  err.style.display = "none";
 
-//   const btn = document.getElementById("submitBtn");
-//   btn.disabled = true;
-//   btn.textContent = "送信中...";
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  btn.textContent = "送信中...";
 
-//   // ★ GASに送るデータ（JSON形式）
-//   const payload = {
-//     action:       "submitSurvey", // ← GASの分岐キー
-//     userId:       lineUserId,     // ← LIFFで取得したuserId
-//     parentName:   parentName,
-//     email:        email,
-//     childName:    childName,
-//     grade:        grade,
-//     studyHistory: studyHistory
-//   };
+  // ★ GASに送るデータ（JSON形式）
+  const payload = {
+    action:       "submitSurvey", // ← GASの分岐キー
+    userId:       lineUserId,     // ← LIFFで取得したuserId
+    parentName:   parentName,
+    email:        email,
+    childName:    childName,
+    grade:        grade,
+    studyHistory: studyHistory
+  };
 
-//   console.log("送信データ:", JSON.stringify(payload));
+  console.log("送信データ:", JSON.stringify(payload));
 
-//   try {
-//     // ★ mode: "no-cors" を削除
-//     // ★ body を JSON.stringify に変更
-//     const res = await fetch(GAS_URL, {
-//       method:  "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body:    JSON.stringify(payload)  // ← JSON形式で送信
-//     });
+  try {
+    // ★ mode: "no-cors" を削除
+    // ★ body を JSON.stringify に変更
+    const res = await fetch(GAS_URL, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify(payload)  // ← JSON形式で送信
+    });
 
-//     // ★ レスポンスをテキストで受け取る
-//     const text = await res.text();
-//     console.log("GASレスポンス:", text);
+    // ★ レスポンスをテキストで受け取る
+    const text = await res.text();
+    console.log("GASレスポンス:", text);
 
     // ★ 成功したらモーダルを表示
     showModal();
