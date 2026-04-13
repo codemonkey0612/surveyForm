@@ -1,5 +1,4 @@
-
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -151,8 +150,9 @@
       <option value="0">0年（はじめて）</option>
       <option value="1">1年以内</option>
       <option value="2">1〜2年</option>
-      <option value="3">2年以上</option>
-      <option value="4">0000年以上</option>
+      <option value="3">2〜3年</option>
+      <!-- ✅ FIX 2: 「0000年以上」→「3年以上」に修正 -->
+      <option value="4">3年以上</option>
     </select>
 
     <button id="submitBtn">送る</button>
@@ -174,13 +174,10 @@
 
 <script>
 // ============================================
-// ★ 設定（変更が必要な箇所）
+// 設定（変更が必要な箇所）
 // ============================================
 const GAS_URL = "https://survey-form-beta-rosy.vercel.app/api/webhook";
-
-// ★ LIFFのIDを確認して正しいものを設定
-// LINE DevelopersのLIFFタブで確認
-const LIFF_ID = "2009328550-oDjbmdjJ"; // ← 先頭の"2"を削除
+const LIFF_ID = "2009328550-oDjbmdjJ";
 
 // ============================================
 // LIFF 初期化
@@ -190,12 +187,16 @@ let lineUserId = "";
 liff.init({ liffId: LIFF_ID })
   .then(async () => {
 
-    // ログインしていない場合はLINEログインへ
-    // if (!liff.isLoggedIn()) {
-    //   liff.login();
-    //   return;
-    // }
-    // ★ LIFFからuserIdを自動取得
+    // ✅ FIX 1: コメントアウトされていたログインチェックを有効化
+    // LINEアプリ内から開いた場合は isLoggedIn() = true のため
+    // このブロックはスキップされ、フォームが直接表示される。
+    // ブラウザから直接開いた場合のみ、LINEログイン画面にリダイレクトされる。
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return;
+    }
+
+    // LIFFからuserIdを自動取得
     const profile = await liff.getProfile();
     lineUserId = profile.userId;
     console.log("userId取得成功:", lineUserId);
@@ -214,7 +215,6 @@ liff.init({ liffId: LIFF_ID })
 
 // ============================================
 // フォーム送信処理
-// ★ URLSearchParams → JSON.stringify に変更
 // ============================================
 async function submitForm() {
   const parentName   = document.getElementById("parentName").value.trim();
@@ -245,10 +245,10 @@ async function submitForm() {
   btn.disabled = true;
   btn.textContent = "送信中...";
 
-  // ★ GASに送るデータ（JSON形式）
+  // GASに送るデータ（JSON形式）
   const payload = {
-    action:       "submitSurvey", // ← GASの分岐キー
-    userId:       lineUserId,     // ← LIFFで取得したuserId
+    action:       "submitSurvey",
+    userId:       lineUserId,
     parentName:   parentName,
     email:        email,
     childName:    childName,
@@ -259,26 +259,20 @@ async function submitForm() {
   console.log("送信データ:", JSON.stringify(payload));
 
   try {
-    // ★ mode: "no-cors" を削除
-    // ★ body を JSON.stringify に変更
     const res = await fetch(GAS_URL, {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(payload)  // ← JSON形式で送信
+      body:    JSON.stringify(payload)
     });
 
-    // ★ レスポンスをテキストで受け取る
     const text = await res.text();
     console.log("GASレスポンス:", text);
 
-    // ★ 成功したらモーダルを表示
     showModal();
 
   } catch (e) {
     console.error("送信エラー:", e);
 
-    // ★ CORSエラーの場合でも送信できている可能性があるため
-    //    モーダルを表示する
     if (e.name === "TypeError" || e.message.includes("Failed to fetch")) {
       console.log("CORSエラーだが送信は成功している可能性あり");
       showModal();
@@ -298,7 +292,6 @@ async function submitForm() {
 function showModal() {
   document.getElementById("successModal").style.display = "flex";
 
-  // 紙吹雪アニメーション
   confetti({
     particleCount: 120,
     spread: 70,
@@ -310,7 +303,6 @@ function showModal() {
     confetti({ particleCount: 80, angle: 120, origin: { x: 1 } });
   }, 250);
 
-  // 2.5秒後に自動で閉じる
   setTimeout(() => {
     closeModal();
   }, 2500);
@@ -323,10 +315,9 @@ function showModal() {
 function closeModal() {
   document.getElementById("successModal").style.display = "none";
 
-  // LINEアプリに戻る（任意）
   if (liff.isInClient()) {
     liff.closeWindow();
   }
 }
 </script>
-</html> -->
+</html>
