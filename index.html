@@ -193,10 +193,10 @@ liff.init({ liffId: LIFF_ID })
     // ブラウザから直接開いた場合のみ、LINEログイン画面にリダイレクトされる
 
     // LIFFからuserIdを自動取得
-    if (!liff.isLoggedIn()) {
-      liff.login();
-      return;
-    }
+    // if (!liff.isLoggedIn()) {
+    //   liff.login();
+    //   return;
+    // }
     const profile = await liff.getProfile();
     lineUserId = profile.userId;
     console.log("userId取得成功:", lineUserId);
