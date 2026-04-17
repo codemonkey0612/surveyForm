@@ -184,31 +184,31 @@ const LIFF_ID = "2009328550-oDjbmdjJ";
 // ============================================
 let lineUserId = "";
 
-liff.init({ liffId: LIFF_ID })
-  .then(async () => {
+// liff.init({ liffId: LIFF_ID })
+//   .then(async () => {
 
-    // ✅ FIX 1: コメントアウトされていたログインチェックを有効化
-    // LINEアプリ内から開いた場合は isLoggedIn() = true のため
-    // このブロックはスキップされ、フォームが直接表示される。
-    // ブラウザから直接開いた場合のみ、LINEログイン画面にリダイレクトされる
+//     // ✅ FIX 1: コメントアウトされていたログインチェックを有効化
+//     // LINEアプリ内から開いた場合は isLoggedIn() = true のため
+//     // このブロックはスキップされ、フォームが直接表示される。
+//     // ブラウザから直接開いた場合のみ、LINEログイン画面にリダイレクトされる
 
-    // LIFFからuserIdを自動取得
-    const profile = await liff.getProfile();
-    lineUserId = profile.userId;
-    console.log("userId取得成功:", lineUserId);
+//     // LIFFからuserIdを自動取得
+//     const profile = await liff.getProfile();
+//     lineUserId = profile.userId;
+//     console.log("userId取得成功:", lineUserId);
 
-    // ボタンのイベントを設定
+//     // ボタンのイベントを設定
+//   })
+//   .catch(err => {
+//     console.error("LIFF初期化エラー:", err);
+//     document.getElementById("error-msg").textContent =
+//       "初期化に失敗しました。LINEアプリから開き直してください。";
+//     document.getElementById("error-msg").style.display = "block";
+//   });
+
+
     document.getElementById("submitBtn")
       .addEventListener("click", submitForm);
-  })
-  .catch(err => {
-    console.error("LIFF初期化エラー:", err);
-    document.getElementById("error-msg").textContent =
-      "初期化に失敗しました。LINEアプリから開き直してください。";
-    document.getElementById("error-msg").style.display = "block";
-  });
-
-
 // ============================================
 // フォーム送信処理
 // ============================================
