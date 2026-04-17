@@ -190,11 +190,7 @@ liff.init({ liffId: LIFF_ID })
     // ✅ FIX 1: コメントアウトされていたログインチェックを有効化
     // LINEアプリ内から開いた場合は isLoggedIn() = true のため
     // このブロックはスキップされ、フォームが直接表示される。
-    // ブラウザから直接開いた場合のみ、LINEログイン画面にリダイレクトされる。
-    if (!liff.isLoggedIn()) {
-      liff.login();
-      return;
-    }
+    // ブラウザから直接開いた場合のみ、LINEログイン画面にリダイレクトされる
 
     // LIFFからuserIdを自動取得
     const profile = await liff.getProfile();
