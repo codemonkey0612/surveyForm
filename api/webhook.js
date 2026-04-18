@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     console.log(req.body);
     // ★ バックグラウンドでGASに転送
     const GAS_URL =
-      'https://script.google.com/macros/s/AKfycbx-bIeff0nTDJTbYQI7f4i6ZGWVYKBnp6sLQbKpQCmfbqsWvP52Z1zogypop17r4G-Diw/exec';
+      'https://script.google.com/macros/s/AKfycbzukOS6AUfaN_5Svh8YpB1vH1pzJHt0D0ZupuedZ2v_10RTDeJs51iBe_OYN_BxhbT3Gg/exec';
     try {
       await forwardToGas(GAS_URL, req.body);
       console.log('GASに転送完了');
