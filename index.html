@@ -159,6 +159,10 @@
     <label class="icon-label">👥 紹介してくださった方のお名前（任意）</label>
     <input type="text" id="referrerName" placeholder="例：田中 様（わからない場合は空欄でOK）">
 
+    <!-- NEW-02: お支払いカード名義欄を追加（任意項目） -->
+    <label class="icon-label">💳 お支払いカードの名義（任意）</label>
+    <input type="text" id="cardName" placeholder="例：HANAKO YAMADA（保護者名と異なる場合のみ）">
+
     <button id="submitBtn">送る</button>
     <div class="footer" style="text-align:center; margin-top:10px; font-size:12px; color:#999;">
       ※入力内容は安全に送信されます
@@ -177,11 +181,15 @@
 </body>
 
 <script>
-
+// ============================================
+// 設定（変更が必要な箇所）
+// ============================================
 const GAS_URL = "https://survey-form-beta-rosy.vercel.app/api/webhook";
 const LIFF_ID = "2009328550-oDjbmdjJ";
 
-
+// ============================================
+// LIFF 初期化
+// ============================================
 let lineUserId = "";
 
 liff.init({ liffId: LIFF_ID })
@@ -213,6 +221,9 @@ liff.init({ liffId: LIFF_ID })
   });
 
 
+// ============================================
+// フォーム送信処理
+// ============================================
 async function submitForm() {
   const parentName   = document.getElementById("parentName").value.trim();
   const email        = document.getElementById("email").value.trim();
@@ -221,6 +232,8 @@ async function submitForm() {
   const studyHistory = document.getElementById("studyHistory").value;
   // 要件3: 紹介者欄（任意）を取得
   const referrerName = document.getElementById("referrerName").value.trim();
+  // NEW-02: カード名義（任意）を取得
+  const cardName     = document.getElementById("cardName").value.trim();
   const err          = document.getElementById("error-msg");
 
   // バリデーション
@@ -253,7 +266,8 @@ async function submitForm() {
     childName:    childName,
     grade:        grade,
     studyHistory: studyHistory,
-    referrerName: referrerName   // 要件3: 紹介者名（任意・空でも送信可）
+    referrerName: referrerName,   // 要件3: 紹介者名（任意・空でも送信可）
+    cardName:     cardName        // NEW-02: カード名義（任意・空でも送信可）
   };
 
   console.log("送信データ:", JSON.stringify(payload));
@@ -286,6 +300,9 @@ async function submitForm() {
 }
 
 
+// ============================================
+// 成功モーダル表示
+// ============================================
 function showModal() {
   document.getElementById("successModal").style.display = "flex";
 
@@ -306,6 +323,9 @@ function showModal() {
 }
 
 
+// ============================================
+// モーダルを閉じる
+// ============================================
 function closeModal() {
   document.getElementById("successModal").style.display = "none";
 
