@@ -12,60 +12,176 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
+    /* ── 基本リセット・変数 ──────────────────────── */
+    :root {
+      --pink:        #d94f8a;
+      --pink-light:  #fce4ef;
+      --pink-pale:   #fdf0f6;
+      --grey-border: #ccc;
+      --grey-text:   #999;
+      --body-text:   #333;
+      --label-text:  #555;
+      --transition:  0.2s ease;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: linear-gradient(135deg, #e3f2fd, #e8f5e9);
+      background: #f5f5f5;
       margin: 0;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       min-height: 100vh;
+      padding: 32px 16px;
     }
 
     .container {
       background: #fff;
-      padding: 30px 24px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 36px 28px 32px;
+      border-radius: 12px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
       width: 100%;
-      max-width: 420px;
+      max-width: 460px;
     }
 
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #2c3e50;
-    }
-
-    label {
-      font-size: 14px;
-      margin-bottom: 6px;
-      display: block;
-      color: #555;
-    }
-
-    .icon-label {
+    /* ── タイトル ────────────────────────────────── */
+    .form-header {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 10px;
+      margin-bottom: 28px;
     }
 
-    input, select {
+    .form-header-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .form-header-text h2 {
+      margin: 0 0 2px;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--body-text);
+    }
+
+    .form-header-text p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--grey-text);
+    }
+
+    /* ── フィールドグループ ──────────────────────── */
+    .field {
+      margin-bottom: 22px;
+      position: relative;
+    }
+
+    /* ラベル */
+    .field label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--label-text);
+      margin-bottom: 6px;
+      transition: color var(--transition);
+    }
+
+    /* ホバー時ラベルをピンクに */
+    .field:hover label,
+    .field:focus-within label {
+      color: var(--pink);
+    }
+
+    /* SVGアイコンのホバー時トランジション */
+    .field label svg {
+      flex-shrink: 0;
+      transition: transform 0.18s ease;
+    }
+
+    .field:hover label svg,
+    .field:focus-within label svg {
+      transform: scale(1.15);
+    }
+
+    /* ── テキスト・メール input ─────────────────── */
+    .field input[type="text"],
+    .field input[type="email"] {
       width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      margin-bottom: 16px;
-      box-sizing: border-box;
+      padding: 9px 0 9px 2px;
+      font-size: 15px;
+      color: var(--body-text);
+      background: transparent;
+      border: none;
+      border-bottom: 1.5px solid var(--grey-border);
+      border-radius: 0;
+      outline: none;
+      transition: border-color var(--transition);
     }
 
-    /* ── 利用規約・PPチェックボックスエリア ── */
+    /* placeholder */
+    .field input[type="text"]::placeholder,
+    .field input[type="email"]::placeholder {
+      color: #bbb;
+      font-size: 14px;
+    }
+
+    /* ホバー・フォーカス時の下線 */
+    .field input[type="text"]:hover,
+    .field input[type="email"]:hover {
+      border-bottom-color: var(--pink);
+    }
+
+    .field input[type="text"]:focus,
+    .field input[type="email"]:focus {
+      border-bottom-color: var(--pink);
+    }
+
+    /* ── セレクト ────────────────────────────────── */
+    .field select {
+      width: 100%;
+      padding: 9px 28px 9px 2px;
+      font-size: 15px;
+      color: var(--body-text);
+      background: transparent;
+      border: none;
+      border-bottom: 1.5px solid var(--grey-border);
+      border-radius: 0;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+      transition: border-color var(--transition);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 4px center;
+    }
+
+    .field select:hover,
+    .field select:focus {
+      border-bottom-color: var(--pink);
+    }
+
+    /* ホバー時セレクト矢印もピンクに */
+    .field:hover select,
+    .field:focus-within select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23d94f8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    }
+
+    /* ── 利用規約・PPチェックボックスエリア ─────── */
     .consent-area {
-      background: #f9f9f9;
-      border: 1px solid #e0e0e0;
+      background: var(--pink-pale);
+      border: 1px solid #f2c0d8;
       border-radius: 10px;
       padding: 14px 16px;
-      margin-bottom: 16px;
+      margin-bottom: 8px;
     }
 
     .consent-item {
@@ -80,61 +196,83 @@
     }
 
     .consent-item input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      min-width: 18px;
-      margin: 0;
-      margin-top: 1px;
+      width: 17px;
+      height: 17px;
+      min-width: 17px;
+      margin: 1px 0 0;
       cursor: pointer;
-      accent-color: #42a5f5;
+      accent-color: var(--pink);
+      border-radius: 3px;
     }
 
     .consent-item label {
       font-size: 13px;
       color: #444;
-      line-height: 1.5;
+      line-height: 1.55;
       cursor: pointer;
-      margin: 0;
+      font-weight: 400;
     }
 
     .consent-item a {
-      color: #42a5f5;
+      color: var(--pink);
       text-decoration: underline;
     }
 
+    .consent-item a:hover {
+      opacity: 0.75;
+    }
+
     .consent-note {
-      font-size: 12px;
-      color: #999;
+      font-size: 11px;
+      color: var(--grey-text);
       text-align: center;
-      margin-bottom: 12px;
+      margin: 6px 0 18px;
     }
 
-    button {
+    /* ── 送信ボタン ──────────────────────────────── */
+    button#submitBtn {
       width: 100%;
-      padding: 12px;
+      padding: 13px;
       border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #42a5f5, #66bb6a);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
+      border-radius: 50px;
+      background: var(--pink);
+      color: #fff;
+      font-weight: 700;
       font-size: 16px;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background var(--transition), opacity var(--transition);
     }
 
-    button:disabled {
-      background: #aaa;
+    button#submitBtn:hover {
+      background: #c03d7a;
+    }
+
+    button#submitBtn:disabled {
+      background: #ccc;
       cursor: not-allowed;
     }
 
+    /* ── エラー ──────────────────────────────────── */
     #error-msg {
       display: none;
       color: #c0392b;
       background: #fdecea;
-      padding: 10px;
+      padding: 10px 12px;
       border-radius: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
+      font-size: 13px;
     }
 
+    /* ── フッター注記 ─────────────────────────────── */
+    .footer-note {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 11px;
+      color: #bbb;
+    }
+
+    /* ── 成功モーダル ─────────────────────────────── */
     .modal {
       position: fixed;
       top: 0; left: 0;
@@ -146,11 +284,26 @@
     }
 
     .modal-content {
-      background: white;
-      padding: 24px;
+      background: #fff;
+      padding: 28px 32px;
       border-radius: 16px;
       text-align: center;
       animation: fadeIn 0.3s ease;
+    }
+
+    .modal-content h3 { color: var(--body-text); margin: 10px 0 6px; }
+    .modal-content p  { color: var(--grey-text); font-size: 14px; margin: 0 0 16px; }
+
+    .modal-content button {
+      padding: 10px 32px;
+      border: none;
+      border-radius: 50px;
+      background: var(--pink);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      width: auto;
     }
 
     .success-icon {
@@ -173,41 +326,134 @@
 
 <body>
   <div class="container">
-    <h2>無料トライアル登録（1分で完了）</h2>
+
+    <div class="form-header">
+      <!-- Qooco ロゴ（アップロード画像に合わせたオレンジのQマーク） -->
+      <div class="form-header-icon">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="18" r="18" fill="#F05A28"/>
+          <!-- Q shape: outer ring -->
+          <circle cx="17" cy="16" r="8" fill="none" stroke="white" stroke-width="3"/>
+          <!-- Q tail -->
+          <line x1="22" y1="21" x2="27" y2="27" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="form-header-text">
+        <h2>無料トライアル登録</h2>
+        <p>1分で完了します</p>
+      </div>
+    </div>
 
     <div id="error-msg"></div>
 
-    <label class="icon-label">👩‍👧 保護者名</label>
-    <input type="text" id="parentName" placeholder="例：山田 花子">
+    <!-- 👩‍👧 保護者名 → 家族・ハートの家アイコン -->
+    <div class="field">
+      <label class="icon-label">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C9.24 2 7 4.24 7 7s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z" fill="#d94f8a"/>
+          <path d="M12 14c-5.33 0-8 2.67-8 4v1h16v-1c0-1.33-2.67-4-8-4z" fill="#d94f8a"/>
+        </svg>
+        保護者名
+      </label>
+      <input type="text" id="parentName" placeholder="例：山田 花子">
+    </div>
 
-    <label class="icon-label">📧 メールアドレス</label>
-    <input type="email" id="email" placeholder="例：hanako@example.com">
+    <!-- 📧 メールアドレス → 封筒アイコン -->
+    <div class="field">
+      <label class="icon-label">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="5" width="20" height="14" rx="2" fill="#d94f8a"/>
+          <path d="M2 7l10 7 10-7" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        メールアドレス
+      </label>
+      <input type="email" id="email" placeholder="例：hanako@example.com">
+    </div>
 
-    <label class="icon-label">🧒 受講者名</label>
-    <input type="text" id="childName" placeholder="例：太郎">
+    <!-- 🧒 受講者名 → 子どもの星アイコン（子どもらしく） -->
+    <div class="field">
+      <label class="icon-label">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 顔 -->
+          <circle cx="12" cy="8" r="5" fill="#FFB300"/>
+          <!-- 目 -->
+          <circle cx="10.2" cy="7.5" r="0.8" fill="#5D4037"/>
+          <circle cx="13.8" cy="7.5" r="0.8" fill="#5D4037"/>
+          <!-- 笑顔 -->
+          <path d="M10 9.5 Q12 11.5 14 9.5" stroke="#5D4037" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+          <!-- 体 -->
+          <path d="M8 14h8l-1 6H9l-1-6z" fill="#d94f8a"/>
+          <!-- 腕 -->
+          <path d="M8 14.5l-3 2.5M16 14.5l3 2.5" stroke="#d94f8a" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        受講者名
+      </label>
+      <input type="text" id="childName" placeholder="例：太郎">
+    </div>
 
-    <label class="icon-label">🎓 学年</label>
-    <select id="grade">
-      <option value="">選んでください</option>
-      <option value="preschool">年少・年中・年長</option>
-      <option value="grade1">小学1年生</option>
-      <option value="grade2">小学2年生</option>
-      <option value="grade3">小学3年生</option>
-    </select>
+    <!-- 🎓 学年 → 学校の星バッジ -->
+    <div class="field">
+      <label class="icon-label">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 帽子 -->
+          <polygon points="12,3 22,8 12,13 2,8" fill="#d94f8a"/>
+          <path d="M6 10v5c0 2 2.5 4 6 4s6-2 6-4v-5" fill="#f8bbd0"/>
+          <!-- タッセル -->
+          <line x1="22" y1="8" x2="22" y2="13" stroke="#d94f8a" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="22" cy="14" r="1.2" fill="#d94f8a"/>
+        </svg>
+        学年
+      </label>
+      <select id="grade">
+        <option value="">選んでください</option>
+        <option value="preschool">年少・年中・年長</option>
+        <option value="grade1">小学1年生</option>
+        <option value="grade2">小学2年生</option>
+        <option value="grade3">小学3年生</option>
+      </select>
+    </div>
 
-    <label class="icon-label">📘 英語学習歴</label>
-    <select id="studyHistory">
-      <option value="0">0年（はじめて）</option>
-      <option value="1">1年以内</option>
-      <option value="2">1〜2年</option>
-      <option value="3">2〜3年</option>
-      <option value="4">3年以上</option>
-    </select>
+    <!-- 📘 英語学習歴 → 開いた本 -->
+    <div class="field">
+      <label class="icon-label">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 左ページ -->
+          <path d="M3 5h8v14H3c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1z" fill="#42a5f5"/>
+          <!-- 右ページ -->
+          <path d="M21 5h-8v14h8c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1z" fill="#64b5f6"/>
+          <!-- 中央の綴じ -->
+          <line x1="12" y1="5" x2="12" y2="19" stroke="white" stroke-width="1.2"/>
+          <!-- 線（文字の代わり） -->
+          <line x1="5" y1="9" x2="10" y2="9" stroke="white" stroke-width="1" stroke-linecap="round"/>
+          <line x1="5" y1="12" x2="10" y2="12" stroke="white" stroke-width="1" stroke-linecap="round"/>
+          <line x1="14" y1="9" x2="19" y2="9" stroke="white" stroke-width="1" stroke-linecap="round"/>
+          <line x1="14" y1="12" x2="19" y2="12" stroke="white" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+        英語学習歴
+      </label>
+      <select id="studyHistory">
+        <option value="0">0年（はじめて）</option>
+        <option value="1">1年以内</option>
+        <option value="2">1〜2年</option>
+        <option value="3">2〜3年</option>
+        <option value="4">3年以上</option>
+      </select>
+    </div>
 
-    <label class="icon-label">👥 紹介してくださった方のお名前（任意）</label>
-    <input type="text" id="referrerName" placeholder="例：田中 様（わからない場合は空欄でOK）">
+    <!-- 👥 紹介者 → 2人の人型 -->
+    <div class="field">
+      <label class="icon-label">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="9" cy="7" r="3.5" fill="#d94f8a"/>
+          <path d="M2 19c0-2.5 3.1-4.5 7-4.5s7 2 7 4.5H2z" fill="#d94f8a"/>
+          <circle cx="17" cy="7" r="3" fill="#f48fb1"/>
+          <path d="M16 14.6c.32-.06.65-.1 1-.1 3.31 0 6 1.79 6 4H17" fill="#f48fb1"/>
+        </svg>
+        紹介してくださった方のお名前（任意）
+      </label>
+      <input type="text" id="referrerName" placeholder="例：田中 様（わからない場合は空欄でOK）">
+    </div>
 
-    <!-- R3・R4: 利用規約・PPの同意チェックボックス（R5: 未チェックは送信不可） -->
     <div class="consent-area">
       <div class="consent-item">
         <input type="checkbox" id="agreeTerms">
@@ -225,10 +471,9 @@
 
     <p class="consent-note">※ 両方にチェックが必要です</p>
 
-    <button id="submitBtn">送る</button>
-    <div class="footer" style="text-align:center; margin-top:10px; font-size:12px; color:#999;">
-      ※入力内容は安全に送信されます
-    </div>
+    <button id="submitBtn">ログイン</button>
+    <p class="footer-note">※ 入力内容は安全に送信されます</p>
+
   </div>
 
   <!-- Success Modal -->
@@ -243,15 +488,15 @@
 </body>
 
 <script>
-
+// ============================================
 // 設定（変更が必要な箇所）
-
+// ============================================
 const GAS_URL = "https://survey-form-beta-rosy.vercel.app/api/webhook";
 const LIFF_ID = "2009328550-oDjbmdjJ";
 
-
+// ============================================
 // LIFF 初期化
-
+// ============================================
 let lineUserId = "";
 
 liff.init({ liffId: LIFF_ID })
@@ -276,9 +521,9 @@ liff.init({ liffId: LIFF_ID })
   });
 
 
-
+// ============================================
 // フォーム送信処理
-
+// ============================================
 async function submitForm() {
   const parentName   = document.getElementById("parentName").value.trim();
   const email        = document.getElementById("email").value.trim();
@@ -360,9 +605,9 @@ async function submitForm() {
 }
 
 
-
+// ============================================
 // 成功モーダル表示
-
+// ============================================
 function showModal() {
   document.getElementById("successModal").style.display = "flex";
 
@@ -383,9 +628,9 @@ function showModal() {
 }
 
 
-
+// ============================================
 // モーダルを閉じる
-
+// ============================================
 function closeModal() {
   document.getElementById("successModal").style.display = "none";
 
