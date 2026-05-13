@@ -59,6 +59,56 @@
       box-sizing: border-box;
     }
 
+    /* ── 利用規約・PPチェックボックスエリア ── */
+    .consent-area {
+      background: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .consent-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .consent-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .consent-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      margin: 0;
+      margin-top: 1px;
+      cursor: pointer;
+      accent-color: #42a5f5;
+    }
+
+    .consent-item label {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.5;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .consent-item a {
+      color: #42a5f5;
+      text-decoration: underline;
+    }
+
+    .consent-note {
+      font-size: 12px;
+      color: #999;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
     button {
       width: 100%;
       padding: 12px;
@@ -133,7 +183,7 @@
     <label class="icon-label">📧 メールアドレス</label>
     <input type="email" id="email" placeholder="例：hanako@example.com">
 
-    <label class="icon-label">🧒 お子さまの名前</label>
+    <label class="icon-label">🧒 受講者名</label>
     <input type="text" id="childName" placeholder="例：太郎">
 
     <label class="icon-label">🎓 学年</label>
@@ -151,17 +201,29 @@
       <option value="1">1年以内</option>
       <option value="2">1〜2年</option>
       <option value="3">2〜3年</option>
-      <!-- 要件3: 「0000年以上」を「3年以上」に修正済み -->
       <option value="4">3年以上</option>
     </select>
 
-    <!-- 要件3: 紹介者欄を追加（任意項目） -->
     <label class="icon-label">👥 紹介してくださった方のお名前（任意）</label>
     <input type="text" id="referrerName" placeholder="例：田中 様（わからない場合は空欄でOK）">
 
-    <!-- NEW-02: お支払いカード名義欄を追加（任意項目） -->
-    <label class="icon-label">💳 お支払いカードの名義（任意）</label>
-    <input type="text" id="cardName" placeholder="例：HANAKO YAMADA（保護者名と異なる場合のみ）">
+    <!-- R3・R4: 利用規約・PPの同意チェックボックス（R5: 未チェックは送信不可） -->
+    <div class="consent-area">
+      <div class="consent-item">
+        <input type="checkbox" id="agreeTerms">
+        <label for="agreeTerms">
+          <a href="https://www.qoocojapan.com/terms" target="_blank">利用規約</a>を読み、内容に同意します
+        </label>
+      </div>
+      <div class="consent-item">
+        <input type="checkbox" id="agreePrivacy">
+        <label for="agreePrivacy">
+          <a href="https://www.qoocojapan.com/privacypolicy" target="_blank">プライバシーポリシー</a>を読み、内容に同意します
+        </label>
+      </div>
+    </div>
+
+    <p class="consent-note">※ 両方にチェックが必要です</p>
 
     <button id="submitBtn">送る</button>
     <div class="footer" style="text-align:center; margin-top:10px; font-size:12px; color:#999;">
@@ -181,35 +243,28 @@
 </body>
 
 <script>
-// ============================================
+
 // 設定（変更が必要な箇所）
-// ============================================
+
 const GAS_URL = "https://survey-form-beta-rosy.vercel.app/api/webhook";
 const LIFF_ID = "2009328550-oDjbmdjJ";
 
-// ============================================
+
 // LIFF 初期化
-// ============================================
+
 let lineUserId = "";
 
 liff.init({ liffId: LIFF_ID })
   .then(async () => {
-
-    // ✅ FIX 1: コメントアウトされていたログインチェックを有効化
-    // LINEアプリ内から開いた場合は isLoggedIn() = true のため
-    // このブロックはスキップされ、フォームが直接表示される。
-    // ブラウザから直接開いた場合のみ、LINEログイン画面にリダイレクトされる。
     if (!liff.isLoggedIn()) {
       liff.login();
       return;
     }
 
-    // LIFFからuserIdを自動取得
     const profile = await liff.getProfile();
     lineUserId = profile.userId;
     console.log("userId取得成功:", lineUserId);
 
-    // ボタンのイベントを設定
     document.getElementById("submitBtn")
       .addEventListener("click", submitForm);
   })
@@ -221,22 +276,21 @@ liff.init({ liffId: LIFF_ID })
   });
 
 
-// ============================================
+
 // フォーム送信処理
-// ============================================
+
 async function submitForm() {
   const parentName   = document.getElementById("parentName").value.trim();
   const email        = document.getElementById("email").value.trim();
-  const childName    = document.getElementById("childName").value.trim();
+  const childName    = document.getElementById("childName").value.trim();   // 受講者名
   const grade        = document.getElementById("grade").value;
   const studyHistory = document.getElementById("studyHistory").value;
-  // 要件3: 紹介者欄（任意）を取得
   const referrerName = document.getElementById("referrerName").value.trim();
-  // NEW-02: カード名義（任意）を取得
-  const cardName     = document.getElementById("cardName").value.trim();
+  const agreeTerms   = document.getElementById("agreeTerms").checked;       // R3
+  const agreePrivacy = document.getElementById("agreePrivacy").checked;     // R4
   const err          = document.getElementById("error-msg");
 
-  // バリデーション
+  // 必須項目チェック
   if (!parentName || !email || !childName || !grade || !studyHistory) {
     err.textContent = "すべての項目を入力してください";
     err.style.display = "block";
@@ -251,13 +305,20 @@ async function submitForm() {
     return;
   }
 
+  // R5: 利用規約・PP 同意チェック
+  if (!agreeTerms || !agreePrivacy) {
+    err.textContent = "利用規約とプライバシーポリシーへの同意が必要です";
+    err.style.display = "block";
+    return;
+  }
+
   err.style.display = "none";
 
   const btn = document.getElementById("submitBtn");
   btn.disabled = true;
   btn.textContent = "送信中...";
 
-  // GASに送るデータ（JSON形式）
+  // GASに送るデータ
   const payload = {
     action:       "submitSurvey",
     userId:       lineUserId,
@@ -266,8 +327,7 @@ async function submitForm() {
     childName:    childName,
     grade:        grade,
     studyHistory: studyHistory,
-    referrerName: referrerName,   // 要件3: 紹介者名（任意・空でも送信可）
-    cardName:     cardName        // NEW-02: カード名義（任意・空でも送信可）
+    referrerName: referrerName
   };
 
   console.log("送信データ:", JSON.stringify(payload));
@@ -300,9 +360,9 @@ async function submitForm() {
 }
 
 
-// ============================================
+
 // 成功モーダル表示
-// ============================================
+
 function showModal() {
   document.getElementById("successModal").style.display = "flex";
 
@@ -323,9 +383,9 @@ function showModal() {
 }
 
 
-// ============================================
+
 // モーダルを閉じる
-// ============================================
+
 function closeModal() {
   document.getElementById("successModal").style.display = "none";
 
