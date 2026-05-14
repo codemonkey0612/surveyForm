@@ -488,15 +488,15 @@
 </body>
 
 <script>
-// ============================================
+
 // 設定（変更が必要な箇所）
-// ============================================
+
 const GAS_URL = "https://survey-form-beta-rosy.vercel.app/api/webhook";
 const LIFF_ID = "2009328550-oDjbmdjJ";
 
-// ============================================
+
 // LIFF 初期化
-// ============================================
+
 let lineUserId = "";
 
 liff.init({ liffId: LIFF_ID })
@@ -521,9 +521,9 @@ liff.init({ liffId: LIFF_ID })
   });
 
 
-// ============================================
+
 // フォーム送信処理
-// ============================================
+
 async function submitForm() {
   const parentName   = document.getElementById("parentName").value.trim();
   const email        = document.getElementById("email").value.trim();
@@ -605,9 +605,9 @@ async function submitForm() {
 }
 
 
-// ============================================
+
 // 成功モーダル表示
-// ============================================
+
 function showModal() {
   document.getElementById("successModal").style.display = "flex";
 
@@ -628,9 +628,9 @@ function showModal() {
 }
 
 
-// ============================================
+
 // モーダルを閉じる
-// ============================================
+
 function closeModal() {
   document.getElementById("successModal").style.display = "none";
 
