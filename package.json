@@ -1,0 +1,8 @@
+{
+  "name": "qooco-survey-form",
+  "version": "1.0.0",
+  "description": "Qooco Club for KIDS — Survey Form (Vercel)",
+  "engines": {
+    "node": ">=18"
+  }
+}

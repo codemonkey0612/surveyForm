@@ -1,134 +1,52 @@
-const https = require('https');
-const http = require('http');
+// api/webhook.js — Vercel Serverless Function
+// ─────────────────────────────────────────────────────────────
+// IMPORTANT: CommonJS syntax only (require/module.exports)
+// DO NOT use import/export — that causes the ESM compile error
+// ─────────────────────────────────────────────────────────────
 
-export default async function handler(req, res) {
+// ⚠️ SET THIS to your GAS deployment URL after deploying GAS
+// GASエディタ → デプロイ → 新しいデプロイ → ウェブアプリ → URLをコピー
+const GAS_ENDPOINT = process.env.GAS_ENDPOINT || "https://script.google.com/macros/s/AKfycbyWhv_1z9aLbWCbtF1Z74i6kTzlmg8317mDfr4o1AwgRt5aVikxt5o7hhKG8rpOjiz58g/exec";
 
-  // CORS設定
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods',
-    'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers',
-    'Content-Type');
+module.exports = async function handler(req, res) {
+  // CORS headers — allow LINE LIFF / browsers to POST
+  res.setHeader("Access-Control-Allow-Origin",  "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // OPTIONSリクエスト対応
-  if (req.method === 'OPTIONS') {
+  // Preflight request
+  if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // GET（動作確認用）
-  if (req.method === 'GET') {
-    return res.status(200).json({
-      status: 'ok',
-      message: 'Qooco Bot is running!'
-    });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  // POST（LINEとフォームからのデータ）
-  if (req.method === 'POST') {
+  try {
+    const body = typeof req.body === "string"
+      ? req.body
+      : JSON.stringify(req.body);
 
-    // ★ LINEにすぐ200を返す
-    res.status(200).json({ status: 'ok' });
-    console.log(req.body);
-    // ★ バックグラウンドでGASに転送
-    const GAS_URL =
-      'https://script.google.com/macros/s/AKfycbyWhv_1z9aLbWCbtF1Z74i6kTzlmg8317mDfr4o1AwgRt5aVikxt5o7hhKG8rpOjiz58g/exec';
-    try {
-      await forwardToGas(GAS_URL, req.body);
-      console.log('GASに転送完了');
-    } catch (err) {
-      console.error('GAS転送エラー:', err.message);
-    }
+    // Forward to GAS
+    const gasRes = await fetch(GAS_ENDPOINT, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    body,
+      redirect: "follow",
+    });
 
-    return;
+    const text = await gasRes.text();
+
+    // Try to parse as JSON; fall back to text
+    let data;
+    try { data = JSON.parse(text); }
+    catch (_) { data = { raw: text }; }
+
+    return res.status(200).json(data);
+
+  } catch (err) {
+    console.error("webhook error:", err);
+    return res.status(500).json({ error: err.message });
   }
-
-  return res.status(200).json({ status: 'ok' });
-}
-
-function forwardToGas(gasUrl, body) {
-  return new Promise((resolve, reject) => {
-
-    const postData = JSON.stringify(body);
-
-    // URLをパースする
-    const urlObj = new URL(gasUrl);
-
-    const options = {
-      hostname: urlObj.hostname,
-      path: urlObj.pathname + urlObj.search,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(postData)
-      }
-    };
-
-    const req = https.request(options, (res) => {
-      let data = '';
-
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-
-      res.on('end', () => {
-        // GASが302リダイレクトを返した場合
-        if (res.statusCode === 302 && res.headers.location) {
-          console.log('302リダイレクト先:', res.headers.location);
-          // リダイレクト先にも転送
-          forwardToRedirect(res.headers.location, body)
-            .then(resolve)
-            .catch(reject);
-        } else {
-          console.log('GAS応答:', res.statusCode, data);
-          resolve(data);
-        }
-      });
-    });
-
-    req.on('error', (err) => {
-      console.error('リクエストエラー:', err.message);
-      reject(err);
-    });
-
-    req.write(postData);
-    req.end();
-  });
-}
-
-function forwardToRedirect(redirectUrl, body) {
-  return new Promise((resolve, reject) => {
-
-    const postData = JSON.stringify(body);
-    const urlObj = new URL(redirectUrl);
-
-    // httpかhttpsか判定
-    const protocol = urlObj.protocol === 'https:' ? https : http;
-
-    const options = {
-      hostname: urlObj.hostname,
-      path: urlObj.pathname + urlObj.search,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(postData)
-      }
-    };
-
-    const req = protocol.request(options, (res) => {
-      let data = '';
-      res.on('data', (chunk) => { data += chunk; });
-      res.on('end', () => {
-        console.log('リダイレクト先応答:', res.statusCode);
-        resolve(data);
-      });
-    });
-
-    req.on('error', (err) => {
-      reject(err);
-    });
-
-    req.write(postData);
-    req.end();
-  });
-}
-
+};
